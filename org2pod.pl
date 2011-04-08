@@ -5,16 +5,18 @@ use Data::Dumper qw/Dumper/;
  
  
 my $outfile= my $infile= $ARGV[0];
- 
+my $DEBUG;
+
 my $f_in;
 if ($infile) {
   print "* Processing $infile => $outfile\n";
   open $f_in , "<", "$infile" ;
-  
 } else {
+  #- No file? test __DATA__  
   $outfile="/tmp/test.pod";
   print "* Processing __DATA__ => $outfile\n"; 
   $f_in=\*DATA;
+  $DEBUG=1;
 }
  
 $outfile =~ s/\.org$/.pod/;
@@ -52,14 +54,16 @@ while(<$f_in>) {
   $out.=$_;
 }
  
-listing_dump();
+listing_dump() if $DEBUG;
  
 #--- Second pass
 $out =~   s#Listing{(\w+)}#listing_ref($1)#gie;
  
 #--- Output
 print $f_out $out;
- 
+print $out if $DEBUG;
+
+
 ##--- Process pod-file
 #my $do=`make.pl $outfile`; 
  
@@ -134,7 +138,7 @@ __DATA__
    Text in C<Path/path/path> might be /Italic/ or *Bold* and
    org-markup nested in POD-markup is I<*ignored*>.
    
-  #+BEGIN_SRC Perl
+  #+BEGIN_SRC: Perl
   print("huhu") while(1);
 
  
