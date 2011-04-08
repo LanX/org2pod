@@ -1,12 +1,10 @@
 #!/usr/bin/perl
- 
 use strict;
 use warnings;
 use Data::Dumper qw/Dumper/;
  
  
 my $outfile= my $infile= $ARGV[0];
-$outfile =~ s/\.org$/.pod/;
  
 my $f_in;
 if ($infile) {
@@ -19,6 +17,7 @@ if ($infile) {
   $f_in=\*DATA;
 }
  
+$outfile =~ s/\.org$/.pod/;
 open my $f_out, ">", "$outfile";
  
  
@@ -32,8 +31,8 @@ print $f_out "\n=encoding utf8\n\n";
 #--- First pass
 while(<$f_in>) {
   #--- Codeblock?
-  if ( /$r_begin_src/ .. /$r_end_src/) {
-    s/($r_end_src|$r_begin_src)/\n/;
+  if ( /$r_begin_src/i .. /$r_end_src/i) {
+    s/($r_end_src|$r_begin_src)/\n/i;
     $_=" $_";                           # add indentation
     s#\s*Listing{(\w+)}#listing_grep($1)#gie;
     
@@ -71,9 +70,9 @@ exit;
 sub convert_markup {
   my $in=$_;
   my $out;
-  my $notPOD=0;                         # flipflop
  
   #--- ignore POD markups
+  my $notPOD=0;                         # flipflop
   for (split /([CBIEZ]<.*?>)/,$in){      
     if ( $notPOD ^= 1 ) {               # odd => not Pod
       #--- translate
@@ -137,7 +136,7 @@ __DATA__
    
   #+BEGIN_SRC Perl
   print("huhu") while(1);
- 
+
  
   LISTING{huhu}
   #+END_SRC 
